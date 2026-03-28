@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Video</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    #playBtn {
+      background: transparent;
+      border: 2px solid #fff;
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 16px 40px;
+      border-radius: 50px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: background 0.3s;
+    }
+
+    #playBtn:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="overlay">
+    <button id="playBtn">▶ PLAY</button>
+  </div>
+
+  <iframe
+    id="videoFrame"
+    src="https://drive.google.com/file/d/1gakl6GgtnrXzZ1umdXBbQr6HIed7Jg33/preview"
+    allow="autoplay"
+    allowfullscreen
+  ></iframe>
+
+  <script>
+    document.getElementById('playBtn').addEventListener('click', function () {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('videoFrame').style.display = 'block';
+    });
+  </script>
+
+</body>
+</html>
