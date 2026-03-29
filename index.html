@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Motion Impostor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #video-container {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    #video-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      cursor: pointer;
+      background: rgba(0,0,0,0.3);
+    }
+
+    #playBtn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 3px solid #fff;
+      color: #fff;
+      font-size: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background 0.3s, transform 0.2s;
+      pointer-events: none;
+      padding-left: 6px;
+    }
+
+    #overlay:hover #playBtn {
+      background: rgba(255,255,255,0.35);
+      transform: scale(1.08);
+    }
+
+    #click-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="video-container">
+    <iframe
+      id="vimeoFrame"
+      src="https://player.vimeo.com/video/1178206165?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&autoplay=0&muted=0"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <div id="overlay">
+    <div id="playBtn">▶</div>
+  </div>
+
+  <div id="click-layer"></div>
+
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script>
+    const overlay = document.getElementById('overlay');
+    const clickLayer = document.getElementById('click-layer');
+    const iframe = document.getElementById('vimeoFrame');
+
+    let player;
+    let skipReady = false;
+    let skipped = false;
+
+    overlay.addEventListener('click', function () {
+      overlay.style.display = 'none';
+      clickLayer.style.display = 'block';
+
+      player = new Vimeo.Player(iframe);
+
+      player.setVolume(1).then(function () {
+        player.play();
+      });
+
+      player.on('timeupdate', function (data) {
+        const t = data.seconds;
+        if (t >= 7 && t < 9) {
+          skipReady = true;
+        } else if (t >= 9) {
+          skipReady = false;
+          skipped = false;
+        }
+      });
+    });
+
+    clickLayer.addEventListener('click', function () {
+      if (skipReady && !skipped && player) {
+        skipped = true;
+        player.setCurrentTime(9);
+      }
+    });
+  </script>
+
+</body>
+</html>
