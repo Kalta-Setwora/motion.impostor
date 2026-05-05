@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Motion Impostor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    #video-container { position: fixed; inset: 0; z-index: 1; }
+    #video-container iframe { width: 100%; height: 100%; border: none; }
+
+    #overlay {
+      position: fixed; inset: 0;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 10; cursor: pointer;
+    }
+    #playBtn {
+      background: transparent; border: 2px solid #fff; color: #fff;
+      font-size: 1.2rem; padding: 16px 40px; border-radius: 50px;
+      letter-spacing: 2px; pointer-events: none; font-family: sans-serif;
+    }
+
+    #soundBtn {
+      position: fixed; top: 20px; right: 20px; z-index: 20; display: none;
+      background: transparent; border: 2px solid #fff; color: #fff;
+      font-size: 0.75rem; padding: 8px 18px; border-radius: 50px;
+      letter-spacing: 1.5px; cursor: pointer; font-family: sans-serif;
+      -webkit-touch-callout: none;
+    }
+
+    #click-layer {
+      position: fixed; inset: 0; z-index: 5; display: none;
+      -webkit-touch-callout: none;
+    }
+
+    #pauseIndicator {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff; font-family: sans-serif; font-size: 1rem;
+      letter-spacing: 2px; opacity: 0; z-index: 15;
+      pointer-events: none; transition: opacity 0.3s;
+    }
+
+    #guide {
+      position: fixed; inset: 0;
+      background: rgba(70,70,70,0.58);
+      z-index: 30; display: none; cursor: pointer;
+      -webkit-touch-callout: none;
+    }
+    .g-label {
+      position: absolute; color: #fff; font-family: sans-serif;
+      font-size: 0.78rem; letter-spacing: 1px; line-height: 1.8;
+      pointer-events: none;
+    }
+    #guide-dismiss {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.55); font-family: sans-serif;
+      font-size: 0.7rem; letter-spacing: 1px; white-space: nowrap;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="video-container">
+  <iframe id="vimeoFrame"
+    src="https://player.vimeo.com/video/1189571230?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&autoplay=0&muted=1"
+    allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+  </iframe>
+</div>
+
+<div id="overlay">
+  <button id="playBtn">PLAY</button>
+</div>
+
+<button id="soundBtn">SOUND OFF</button>
+<div id="click-layer"></div>
+<div id="pauseIndicator">PAUSED</div>
+
+<div id="guide">
+  <svg style="position:absolute;top:54px;right:22px;width:22px;height:36px;" viewBox="0 0 22 36" pointer-events="none">
+    <line x1="11" y1="32" x2="11" y2="4" stroke="white" stroke-width="2"/>
+    <polyline points="4,12 11,2 18,12" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  <div class="g-label" style="top:94px;right:8px;text-align:right;">เปิด / ปิด เสียง</div>
+
+  <svg style="position:absolute;top:calc(50% - 100px);left:calc(50% - 11px);width:22px;height:36px;" viewBox="0 0 22 36" pointer-events="none">
+    <line x1="11" y1="32" x2="11" y2="4" stroke="white" stroke-width="2"/>
+    <polyline points="4,12 11,2 18,12" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  <div class="g-label" style="top:calc(50% - 56px);left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;">
+    แตะหน้าจอ 1 ครั้ง<br>หยุด / เล่นต่อ
+  </div>
+
+  <div class="g-label" style="top:50%;right:8px;transform:translateY(20px);text-align:right;">
+    กดค้างด้านขวา<br>เพื่อเร่ง 2×
+  </div>
+  <svg style="position:absolute;top:50%;right:106px;transform:translateY(28px);width:36px;height:20px;" viewBox="0 0 36 20" pointer-events="none">
+    <line x1="2" y1="10" x2="30" y2="10" stroke="white" stroke-width="2"/>
+    <polyline points="22,3 32,10 22,17" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+
+  <div class="g-label" style="top:50%;left:8px;transform:translateY(20px);text-align:left;">
+    กดค้างด้านซ้าย<br>เพื่อกรอย้อนหลัง
+  </div>
+  <svg style="position:absolute;top:50%;left:120px;transform:translateY(28px);width:36px;height:20px;" viewBox="0 0 36 20" pointer-events="none">
+    <line x1="34" y1="10" x2="6" y2="10" stroke="white" stroke-width="2"/>
+    <polyline points="14,3 4,10 14,17" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+
+  <div id="guide-dismiss">แตะที่ไหนก็ได้เพื่อปิดและเริ่มเล่น</div>
+</div>
+
+<script src="https://player.vimeo.com/api/player.js"></script>
+<script>
+  const overlayEl  = document.getElementById('overlay');
+  const clickLayer = document.getElementById('click-layer');
+  const soundBtn   = document.getElementById('soundBtn');
+  const iframe     = document.getElementById('vimeoFrame');
+  const guide      = document.getElementById('guide');
+  const pauseInd   = document.getElementById('pauseIndicator');
+
+  let player, isMuted = true, isPaused = false;
+  let skipReady = false, skipped = false;
+  let isHolding = false, holdTimer = null, rewindInterval = null;
+  let currentTime = 0;
+
+  overlayEl.addEventListener('click', function () {
+    overlayEl.style.display = 'none';
+    soundBtn.style.display = 'block';
+    player = new Vimeo.Player(iframe);
+    player.setMuted(true);
+    guide.style.display = 'block';
+  });
+
+  guide.addEventListener('click', function () {
+    guide.style.display = 'none';
+    clickLayer.style.display = 'block';
+    player.play();
+
+    player.on('timeupdate', function (data) {
+      currentTime = data.seconds;
+      if (currentTime >= 7 && currentTime < 8.85) {
+        skipReady = true;
+      } else if (currentTime >= 8.85) {
+        skipReady = false;
+        skipped = false;
+      }
+    });
+  });
+
+  soundBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (!player) return;
+    isMuted = !isMuted;
+    player.setMuted(isMuted);
+    if (!isMuted) player.setVolume(1);
+    soundBtn.textContent = isMuted ? 'SOUND OFF' : 'SOUND ON';
+  });
+
+  clickLayer.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    const isRight = e.clientX > window.innerWidth * 0.6;
+    const isLeft  = e.clientX < window.innerWidth * 0.4;
+
+    if (isRight) {
+      holdTimer = setTimeout(() => {
+        isHolding = true;
+        if (!player) return;
+        player.setPlaybackRate(2);
+      }, 200);
+    } else if (isLeft) {
+      holdTimer = setTimeout(() => {
+        isHolding = true;
+        if (!player) return;
+        rewindInterval = setInterval(() => {
+          currentTime = Math.max(0, currentTime - 0.25);
+          player.setCurrentTime(currentTime);
+        }, 100);
+      }, 200);
+    }
+  });
+
+  function stopHold() {
+    clearTimeout(holdTimer);
+    if (rewindInterval) {
+      clearInterval(rewindInterval);
+      rewindInterval = null;
+    }
+    if (isHolding && player) {
+      player.setPlaybackRate(1);
+    }
+    isHolding = false;
+  }
+
+  clickLayer.addEventListener('pointerup', function (e) {
+    e.preventDefault();
+    const wasHolding = isHolding;
+    stopHold();
+    if (wasHolding) return;
+    if (!player) return;
+
+    if (skipReady && !skipped) {
+      skipped = true;
+      player.setCurrentTime(8.85);
+      return;
+    }
+
+    isPaused = !isPaused;
+    isPaused ? player.pause() : player.play();
+    pauseInd.style.opacity = isPaused ? '1' : '0';
+  });
+
+  clickLayer.addEventListener('pointerleave', stopHold);
+  clickLayer.addEventListener('pointercancel', stopHold);
+</script>
+
+</body>
+</html>
