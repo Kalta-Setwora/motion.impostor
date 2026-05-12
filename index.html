@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Motion Impostor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000; width: 100vw; height: 100vh;
+      overflow: hidden;
+      -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+    }
+    #video-container { position: fixed; inset: 0; z-index: 1; }
+    #video-container iframe { width: 100%; height: 100%; border: none; }
+    #overlay {
+      position: fixed; inset: 0; display: flex;
+      justify-content: center; align-items: center; z-index: 10; cursor: pointer;
+    }
+    #playBtn {
+      background: transparent; border: 2px solid #fff; color: #fff;
+      font-size: 1.2rem; padding: 16px 40px; border-radius: 50px;
+      letter-spacing: 2px; pointer-events: none; font-family: sans-serif;
+    }
+    .top-btn {
+      position: fixed; top: 20px; z-index: 20; display: none;
+      background: transparent; border: 2px solid #fff; color: #fff;
+      font-size: 0.75rem; padding: 8px 18px; border-radius: 50px;
+      letter-spacing: 1.5px; cursor: pointer; font-family: sans-serif;
+      -webkit-touch-callout: none;
+    }
+    #soundBtn { right: 20px; }
+    #subBtn   { right: 148px; }
+    #openReadBtn {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      z-index: 20; display: none;
+      background: transparent; border: 2px solid #fff; color: #fff;
+      font-size: 0.85rem; padding: 10px 28px; border-radius: 50px;
+      letter-spacing: 2px; cursor: pointer; font-family: sans-serif;
+      -webkit-touch-callout: none;
+      animation: fadeUp 0.4s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    #subtitle {
+      position: fixed; bottom: 28px;
+      left: 50%; transform: translateX(-50%);
+      width: max-content; max-width: 88vw;
+      z-index: 15; pointer-events: none;
+      color: #fff; font-family: sans-serif; font-size: 0.88rem;
+      text-align: center; line-height: 1.75;
+      display: none;
+    }
+    .sub-line {
+      display: inline;
+      background: rgba(10,10,10,0.45);
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      padding: 0.1em 0.45em 0.15em;
+      border-radius: 3px;
+      white-space: pre-wrap;
+    }
+    #click-layer { position: fixed; inset: 0; z-index: 5; display: none; -webkit-touch-callout: none; }
+    #pauseIndicator {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      color: #fff; font-family: sans-serif; font-size: 1rem;
+      letter-spacing: 2px; opacity: 0; z-index: 15;
+      pointer-events: none; transition: opacity 0.3s;
+    }
+    #guide {
+      position: fixed; inset: 0; background: rgba(70,70,70,0.58);
+      z-index: 30; display: none; cursor: pointer; -webkit-touch-callout: none;
+    }
+    .g-label {
+      position: absolute; color: #fff; font-family: sans-serif;
+      font-size: 0.78rem; letter-spacing: 1px; line-height: 1.8; pointer-events: none;
+    }
+    #guide-dismiss {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.55); font-family: sans-serif;
+      font-size: 0.7rem; letter-spacing: 1px; white-space: nowrap; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="video-container">
+  <iframe id="vimeoFrame"
+    src="https://player.vimeo.com/video/1191526028?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&autoplay=0&muted=1"
+    allow="autoplay; fullscreen; picture-in-picture" allowfullscreen>
+  </iframe>
+</div>
+
+<div id="overlay"><button id="playBtn">PLAY</button></div>
+<button id="soundBtn" class="top-btn">SOUND OFF</button>
+<button id="subBtn"   class="top-btn">SUB ENG</button>
+<div id="subtitle"></div>
+<button id="openReadBtn">เปิดอ่าน</button>
+<div id="click-layer"></div>
+<div id="pauseIndicator">PAUSED</div>
+
+<div id="guide">
+  <svg style="position:absolute;top:54px;right:22px;width:22px;height:36px;" viewBox="0 0 22 36" pointer-events="none">
+    <line x1="11" y1="32" x2="11" y2="4" stroke="white" stroke-width="2"/>
+    <polyline points="4,12 11,2 18,12" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  <div class="g-label" style="top:94px;right:8px;text-align:right;">เปิด / ปิด เสียง</div>
+
+  <svg style="position:absolute;top:54px;right:150px;width:22px;height:36px;" viewBox="0 0 22 36" pointer-events="none">
+    <line x1="11" y1="32" x2="11" y2="4" stroke="white" stroke-width="2"/>
+    <polyline points="4,12 11,2 18,12" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  <div class="g-label" style="top:94px;right:118px;text-align:right;">ซับไตเติ้ลภาษาอังกฤษ</div>
+
+  <svg style="position:absolute;top:calc(50% - 100px);left:calc(50% - 11px);width:22px;height:36px;" viewBox="0 0 22 36" pointer-events="none">
+    <line x1="11" y1="32" x2="11" y2="4" stroke="white" stroke-width="2"/>
+    <polyline points="4,12 11,2 18,12" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+  <div class="g-label" style="top:calc(50% - 56px);left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;">
+    แตะหน้าจอ 1 ครั้ง<br>หยุด / เล่นต่อ
+  </div>
+
+  <div class="g-label" style="top:50%;right:8px;transform:translateY(20px);text-align:right;">
+    กดค้างด้านขวา<br>เพื่อเร่ง 2×
+  </div>
+  <svg style="position:absolute;top:50%;right:106px;transform:translateY(28px);width:36px;height:20px;" viewBox="0 0 36 20" pointer-events="none">
+    <line x1="2" y1="10" x2="30" y2="10" stroke="white" stroke-width="2"/>
+    <polyline points="22,3 32,10 22,17" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+
+  <div class="g-label" style="top:50%;left:8px;transform:translateY(20px);text-align:left;">
+    กดค้างด้านซ้าย<br>เพื่อกรอย้อนหลัง
+  </div>
+  <svg style="position:absolute;top:50%;left:120px;transform:translateY(28px);width:36px;height:20px;" viewBox="0 0 36 20" pointer-events="none">
+    <line x1="34" y1="10" x2="6" y2="10" stroke="white" stroke-width="2"/>
+    <polyline points="14,3 4,10 14,17" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  </svg>
+
+  <div id="guide-dismiss">แตะที่ไหนก็ได้เพื่อปิดและเริ่มเล่น</div>
+</div>
+
+<script src="https://player.vimeo.com/api/player.js"></script>
+<script>
+const subs = [
+  { s:0,   e:3,   t:"Does it ever wear you out..." },
+  { s:3,   e:8,   t:"...having to be 'the capable one' all the time?" },
+  { s:8,   e:13,  t:"After a long day, you finally sit down to rest." },
+  { s:13,  e:17,  t:"Every single day, you push yourself to prove your worth." },
+  { s:17,  e:21,  t:"The exhaustion catches up with you, and you fall asleep." },
+  { s:23,  e:28,  t:"You slip into another world —" },
+  { s:28,  e:32,  t:"one that feels strangely unfamiliar." },
+  { s:32,  e:36,  t:"You find yourself in a vast forest." },
+  { s:36,  e:39,  t:"It's full of hardworking ants —" },
+  { s:39,  e:42,  t:"and somehow, you can talk to them." },
+  { s:42,  e:47,  t:"So you ask: \"Where are you all heading?\"" },
+  { s:47,  e:52,  t:"\"We've been out foraging." },
+  { s:52,  e:57,  t:"A flood hit days ago and we can't find our way back.\"" },
+  { s:57,  e:62,  t:"\"Could you help us get home?\" — \"Of course.\"" },
+  // 1:02 - 1:04 bridge
+  { s:62,  e:64,  t:"You follow them quietly past this clear, still stream." },
+  // 1:04 - 1:20 Stream of Thoughts
+  { s:64,  e:67,  t:"This is the Stream of Thoughts." },
+  { s:67,  e:70,  t:"Whatever you think — it appears here." },
+  { s:70,  e:73,  t:"\"Someone else would have done this so much better.\"" },
+  { s:73,  e:76,  t:"\"Honestly, I'm not that talented.\"" },
+  { s:76,  e:79,  t:"\"If they ever knew the truth, they'd be so disappointed.\"" },
+  { s:79,  e:82,  t:"\"I only got here because of luck.\"" },
+  { s:82,  e:86,  t:"\"I just haven't tried hard enough.\"" },
+  { s:100, e:106, t:"If any of this sounds familiar — you are not alone." },
+  { s:106, e:112, t:"70% of people have felt they weren't truly capable..." },
+  { s:112, e:119, t:"...or that they didn't deserve the success they'd earned." },
+  { s:119, e:126, t:"Even highly successful people go through this." },
+  { s:126, e:133, t:"It's called Impostor Syndrome." },
+  { s:133, e:140, t:"\"And it can be worked through —" },
+  { s:140, e:148, t:"once you understand where it comes from.\"" },
+  { s:150, e:157, t:"You walk on and arrive at a rocky clearing in the forest." },
+  { s:157, e:163, t:"A shaft of light falls on something large..." },
+  { s:163, e:170, t:"...a massive ant colony. You've found the nest." },
+  { s:172, e:179, t:"But you realise you never got to know" },
+  { s:179, e:185, t:"the ants who walked with you." },
+  { s:185, e:192, t:"Maybe it's worth taking a closer look." },
+  { s:192, e:200, t:"You might find something in them that feels familiar." },
+  { s:206, e:213, t:"The Expert." },
+  { s:213, e:219, t:"Needs to know everything before they can act." },
+  { s:219, e:225, t:"Terrified of being seen as incompetent." },
+  { s:225, e:232, t:"Deeply anxious when they can't answer — or don't know something." },
+  { s:240, e:248, t:"The Superhuman." },
+  { s:248, e:254, t:"Tries to excel at everything, all at once." },
+  { s:254, e:260, t:"Forgets that limits exist." },
+  { s:260, e:268, t:"One mistake feels like total failure." },
+  { s:269, e:277, t:"The Soloist." },
+  { s:277, e:283, t:"Believes that asking for help means you're weak." },
+  { s:283, e:291, t:"So they carry everything alone — even when it's far too much." },
+  { s:294, e:302, t:"The Natural Genius." },
+  { s:302, e:309, t:"Expects to get things right on the very first try." },
+  { s:309, e:317, t:"If it takes effort — or goes wrong —" },
+  { s:317, e:325, t:"they think it means they're not truly gifted." },
+  { s:327, e:335, t:"The Perfectionist." },
+  { s:335, e:342, t:"Sets impossibly high standards. Allows zero mistakes." },
+  { s:342, e:350, t:"Even the smallest slip feels like proof they're 'still not good enough.'" },
+  { s:353, e:361, t:"Each of these five ants has a name and a defined origin." },
+  { s:361, e:370, t:"Curious what they're called?" },
+  { s:372, e:380, t:"Impostor Syndrome is not a disorder." },
+  { s:380, e:388, t:"It's a pattern of thinking that can affect absolutely anyone —" },
+  { s:388, e:396, t:"students, professionals, and even highly successful people." },
+  { s:396, e:404, t:"Having these thoughts is nobody's fault." },
+  { s:404, e:412, t:"It often comes from a mix of things:" },
+  { s:412, e:419, t:"high expectations placed on you," },
+  { s:419, e:426, t:"constantly comparing yourself to others," },
+  { s:426, e:433, t:"a culture that rewards achievement above all else," },
+  { s:433, e:441, t:"and a social media feed full of everyone else's highlight reel." },
+  { s:443, e:451, t:"Impostor Syndrome is nothing to be afraid of." },
+  { s:451, e:459, t:"You just have to understand it — and make peace with it." },
+  { s:459, e:466, t:"You don't have to be perfect all the time." },
+  { s:466, e:474, t:"You just have to be you — a you that is still growing." },
+  { s:476, e:484, t:"You follow the path all the way to its end." },
+  { s:484, e:492, t:"Before parting ways, one of the ants hands you something." },
+  { s:492, e:500, t:"Do you want to open it?" },
+  { s:508, e:516, t:"Every mistake you've made." },
+  { s:516, e:524, t:"Every moment you've doubted yourself." },
+  { s:524, e:533, t:"All of it has shaped you into who you are today —" },
+  { s:533, e:541, t:"and that version of you is the strongest one yet." },
+  { s:542, e:556, t:"If you'd like to talk to someone:\nMental Health Hotline: 1323\nSWU SMILE: 02 258 9105 | LINE @swusmile\n(for SWU students)" },
+  { s:560, e:590, t:"Senior Project — Communication Innovation\nKalta Setwora & Issada-on Muktad\nHealth Communication, COSCI, SWU\n\nAdvisor: Asst. Prof. Apirapee Settharuk Tancharoenwong\nCommittee: Asst. Prof. Dr. Srirath Pakdeeronachit\nAsst. Prof. Dr. Chanonya Chaiwongroj · Dr. Supkanate Chunhasiriruk\n\nInspired by Dr. Valerie Young's 5 Competence Types" },
+];
+
+const overlayEl   = document.getElementById('overlay');
+const clickLayer  = document.getElementById('click-layer');
+const soundBtn    = document.getElementById('soundBtn');
+const subBtn      = document.getElementById('subBtn');
+const subtitleEl  = document.getElementById('subtitle');
+const openReadBtn = document.getElementById('openReadBtn');
+const iframe      = document.getElementById('vimeoFrame');
+const guide       = document.getElementById('guide');
+const pauseInd    = document.getElementById('pauseIndicator');
+
+let player, isMuted=true, isPaused=false, subOn=true;
+let isHolding=false, holdTimer=null, rewindInterval=null;
+let currentTime=0, openReadShown=false, openReadDismissed=false;
+let lastSubText = '';
+
+function updateSubtitle(t) {
+  if (!subOn) {
+    if (subtitleEl.innerHTML !== '') subtitleEl.innerHTML = '';
+    return;
+  }
+  const found = subs.find(s => t >= s.s && t < s.e);
+  const newText = found ? found.t : '';
+  if (newText !== lastSubText) {
+    lastSubText = newText;
+    if (!newText) {
+      subtitleEl.innerHTML = '';
+    } else {
+      // split by \n so multiline subs each get their own highlight span
+      const lines = newText.split('\n');
+      subtitleEl.innerHTML = lines.map(l => `<span class="sub-line">${l}</span>`).join('<br>');
+    }
+  }
+}
+
+overlayEl.addEventListener('click', function(){
+  overlayEl.style.display='none';
+  soundBtn.style.display='block';
+  subBtn.style.display='block';
+  subtitleEl.style.display='block';
+  player = new Vimeo.Player(iframe);
+  player.setMuted(true);
+  guide.style.display='block';
+});
+
+guide.addEventListener('click', function(){
+  guide.style.display='none';
+  clickLayer.style.display='block';
+  player.play();
+  player.on('timeupdate', function(data){
+    currentTime = data.seconds;
+    updateSubtitle(currentTime);
+    // ปุ่มเปิดอ่าน ขึ้นเร็วขึ้น ~4:04
+    if (currentTime >= 243 && currentTime < 252 && !openReadShown && !openReadDismissed){
+      openReadShown=true;
+      openReadBtn.style.display='block';
+    } else if ((currentTime < 243 || currentTime >= 252) && openReadShown){
+      openReadShown=false;
+      openReadBtn.style.display='none';
+    }
+  });
+});
+
+soundBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  if (!player) return;
+  isMuted=!isMuted;
+  player.setMuted(isMuted);
+  if (!isMuted) player.setVolume(1);
+  soundBtn.textContent = isMuted?'SOUND OFF':'SOUND ON';
+});
+
+subBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  subOn=!subOn;
+  subBtn.textContent = subOn?'SUB ENG':'SUB OFF';
+  if (!subOn) { subtitleEl.innerHTML=''; lastSubText=''; }
+});
+
+openReadBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  openReadBtn.style.display='none';
+  openReadDismissed=true;
+  if (player) player.setCurrentTime(251);
+});
+
+clickLayer.addEventListener('pointerdown', function(e){
+  e.preventDefault();
+  const isRight = e.clientX > window.innerWidth*0.6;
+  const isLeft  = e.clientX < window.innerWidth*0.4;
+  if (isRight){
+    holdTimer = setTimeout(()=>{
+      isHolding=true;
+      if (player) player.setPlaybackRate(2);
+    }, 200);
+  } else if (isLeft){
+    holdTimer = setTimeout(()=>{
+      isHolding=true;
+      if (!player) return;
+      rewindInterval = setInterval(()=>{
+        currentTime = Math.max(0, currentTime-0.25);
+        player.setCurrentTime(currentTime);
+      }, 100);
+    }, 200);
+  }
+});
+
+function stopHold(){
+  clearTimeout(holdTimer);
+  if (rewindInterval){ clearInterval(rewindInterval); rewindInterval=null; }
+  if (isHolding && player) player.setPlaybackRate(1);
+  isHolding=false;
+}
+
+clickLayer.addEventListener('pointerup', function(e){
+  e.preventDefault();
+  const wasHolding=isHolding;
+  stopHold();
+  if (wasHolding) return;
+  if (!player) return;
+  isPaused=!isPaused;
+  isPaused?player.pause():player.play();
+  pauseInd.style.opacity=isPaused?'1':'0';
+});
+
+clickLayer.addEventListener('pointerleave', stopHold);
+clickLayer.addEventListener('pointercancel', stopHold);
+</script>
+
+</body>
+</html>
