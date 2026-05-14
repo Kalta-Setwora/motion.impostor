@@ -144,6 +144,7 @@
 <script src="https://player.vimeo.com/api/player.js"></script>
 <script>
 const subs = [
+  // ---- ก่อน 1:42 → เวลาเดิมทุกอย่าง ----
   { s:0,   e:8,   t:"Does it ever wear you out...\nhaving to be 'the capable one' all the time?" },
   { s:8,   e:13,  t:"After a long day, you finally sit down to rest." },
   { s:13,  e:17,  t:"Every single day, you push yourself to prove your worth —" },
@@ -171,61 +172,59 @@ const subs = [
   { s:96,  e:99,  t:"or that they didn't deserve the success they'd earned." },
   { s:99,  e:105, t:"Even highly successful people face this —\nthey too live with Impostor Syndrome." },
   { s:105, e:108, t:"\"This feeling can be overcome\nonce we understand its roots.\"" },
+  // ---- 1:40-1:51 → รังมด 3 บรรทัด ----
   { s:100, e:104, t:"You walk on until you reach a rocky clearing in the forest." },
-  { s:104, e:106, t:"Light filters through onto a stone —" },
-  { s:106, e:111, t:"revealing a massive ant colony. You've made it to the nest." },
+  { s:104, e:107, t:"Light filters through onto a stone —" },
+  { s:107, e:111, t:"revealing a massive ant colony. You've made it to the nest." },
+  // ---- หลัง 1:51 ต่อเนื่อง ----
   { s:112, e:117, t:"But you never really got to know\nthe ants who walked with you." },
   { s:117, e:122, t:"Why not take a closer look?" },
   { s:122, e:126, t:"You might find something in them\nthat feels familiar." },
-  // The Expert: จบที่ 2:12 = 132s
-  { s:126, e:130, t:"The Expert." },
-  { s:130, e:136, t:"Needs to know everything before acting —\nafraid of being seen as incompetent." },
-  { s:136, e:132, t:"" },
-  { s:128, e:132, t:"Deeply anxious whenever they can't answer something." },
-  // The Superhuman: 2:14-2:21 = 134-141s
+  // The Expert: 2:00-2:12 รวมบรรทัดเดียว
+  { s:120, e:132, t:"The Expert.\nNeeds to know everything before acting —\nafraid of being seen as incompetent.\nDeeply anxious whenever they can't answer something." },
+  // The Superhuman: 2:14-2:21
   { s:134, e:137, t:"The Superhuman." },
   { s:137, e:141, t:"Tries to excel at every role, all at once —\nand forgets their own limits." },
-  { s:141, e:134, t:"" },
-  // The Soloist: 2:23-2:35 = 143-155s
-  { s:143, e:146, t:"The Soloist." },
-  { s:146, e:150, t:"Believes that asking for help is a sign of weakness." },
-  { s:150, e:155, t:"So they carry everything alone —\neven when it's far too much." },
-  // The Natural Genius: 2:37-2:47 = 157-167s
-  { s:157, e:160, t:"The Natural Genius." },
-  { s:160, e:164, t:"Expects to get things right on the very first try,\nno practice needed." },
+  // The Soloist: 2:23-2:35
+  { s:143, e:147, t:"The Soloist." },
+  { s:147, e:151, t:"Believes that asking for help is a sign of weakness." },
+  { s:151, e:155, t:"So they carry everything alone —\neven when it's far too much." },
+  // The Natural Genius: 2:37-2:47
+  { s:157, e:161, t:"The Natural Genius." },
+  { s:161, e:164, t:"Expects to get things right on the very first try,\nno practice needed." },
   { s:164, e:167, t:"If it takes effort — or goes wrong —\nthey feel they're not truly gifted." },
-  // The Perfectionist: 2:49-2:55 = 169-175s
+  // The Perfectionist: 2:49-2:55
   { s:169, e:172, t:"The Perfectionist." },
   { s:172, e:175, t:"Sets impossibly high standards. No mistakes allowed." },
-  { s:175, e:169, t:"" },
-  // 2:56-3:03 = 176-183s
+  // 2:56-3:03
   { s:176, e:183, t:"Each of these five mindsets has a name and an origin.\nCurious what they are?" },
-  // Impostor Syndrome: 3:07-3:15 = 187-195s
+  // 3:07-3:15
   { s:187, e:191, t:"Impostor Syndrome is not a disorder." },
   { s:191, e:195, t:"It's a pattern of thinking that can affect absolutely anyone —" },
-  // 3:17-3:26 = 197-206s
-  { s:197, e:202, t:"students, working adults,\nand even highly successful people." },
-  // 3:28-3:45 = 208-225s (ติดกันเลย)
+  // 3:17-3:26
+  { s:197, e:206, t:"students, working adults,\nand even highly successful people." },
+  // 3:28-3:45 ติดกันเลย ไม่มี gap
   { s:208, e:212, t:"Having these thoughts is nobody's fault." },
   { s:212, e:216, t:"It often comes from a combination of things:" },
   { s:216, e:219, t:"high expectations placed on you," },
   { s:219, e:222, t:"comparing yourself to others," },
   { s:222, e:225, t:"a culture that prizes achievement above all else," },
+  // ซับหลัง 3:45 ติดกันเลย
   { s:225, e:229, t:"and a social media feed full of everyone else's highlights." },
-  // ต่อจากนี้ติดกันเลย
   { s:229, e:233, t:"Impostor Syndrome is nothing to be afraid of." },
   { s:233, e:237, t:"You just have to understand it — and make peace with it." },
   { s:237, e:241, t:"You don't have to be perfect all the time." },
   { s:241, e:246, t:"You just have to be you — a you that is still growing." },
-  { s:247, e:252, t:"You follow the path all the way to its end." },
-  { s:252, e:257, t:"Before you part ways, one of the ants hands you something." },
-  { s:257, e:260, t:"Go ahead — open it..." },
-  { s:251, e:256, t:"Every mistake you've made." },
-  { s:256, e:261, t:"Every moment of self-doubt." },
-  { s:261, e:267, t:"All of it has shaped you into who you are today —" },
-  { s:267, e:273, t:"and that version of you is the strongest one yet." },
-  { s:259, e:273, t:"If you'd like to talk to someone:\nMental Health Hotline: 1323\nSWU SMILE: 02 258 9105 · LINE @swusmile\n(for SWU students)" },
-  { s:260, e:275, t:"Senior Project — Communication Innovation\nKalta Setworphat & Itsada-on Muktad\nHealth Communication, COSCI, SWU\n\nAdvisor: Asst. Prof. Apirapee Settharuk Tancharoenwong\nCommittee: Asst. Prof. Dr. Srirath Pakdeeronachit\nAsst. Prof. Dr. Chanonya Chaiwongroj · Dr. Supkanate Chunhasiriruk\n\nInspired by Dr. Valerie Young's 5 Competence Types" },
+  { s:246, e:251, t:"You follow the path all the way to its end." },
+  { s:251, e:255, t:"Before you part ways, one of the ants hands you something." },
+  { s:255, e:258, t:"Go ahead — open it..." },
+  { s:258, e:262, t:"Every mistake you've made." },
+  { s:262, e:267, t:"Every moment of self-doubt." },
+  { s:267, e:272, t:"All of it has shaped you into who you are today —" },
+  { s:272, e:277, t:"and that version of you is the strongest one yet." },
+  { s:277, e:245, t:"If you'd like to talk to someone:\nMental Health Hotline: 1323\nSWU SMILE: 02 258 9105 · LINE @swusmile\n(for SWU students)" },
+  // เครดิต 4:08 = 248s
+  { s:248, e:300, t:"Senior Project — Communication Innovation\nKalta Setworphat & Itsada-on Muktad\nHealth Communication, COSCI, SWU\n\nAdvisor: Asst. Prof. Apirapee Settharuk Tancharoenwong\nCommittee: Asst. Prof. Dr. Srirath Pakdeeronachit\nAsst. Prof. Dr. Chanonya Chaiwongroj · Dr. Supkanate Chunhasiriruk\n\nInspired by Dr. Valerie Young's 5 Competence Types" },
 ];
 
 const overlayEl   = document.getElementById('overlay');
@@ -277,9 +276,10 @@ guide.addEventListener('click', function () {
   player.on('timeupdate', function (data) {
     currentTime = data.seconds;
     updateSubtitle(currentTime);
-    if (currentTime >= 243 && currentTime < 251 && !openReadShown && !openReadDismissed) {
+    // เปิดอ่าน ขึ้นที่ 3:52 = 232s
+    if (currentTime >= 232 && currentTime < 240 && !openReadShown && !openReadDismissed) {
       openReadShown = true; openReadBtn.style.display = 'block';
-    } else if ((currentTime < 243 || currentTime >= 251) && openReadShown) {
+    } else if ((currentTime < 232 || currentTime >= 240) && openReadShown) {
       openReadShown = false; openReadBtn.style.display = 'none';
     }
   });
